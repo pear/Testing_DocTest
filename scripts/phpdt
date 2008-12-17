@@ -1,0 +1,101 @@
+#!@php_bin@
+<?php
+
+/* vim: set expandtab tabstop=4 shiftwidth=4 softtabstop=4: */
+
+/**
+ * This file is part of the PEAR Testing_DocTest package.
+ *
+ * PHP version 5
+ *
+ * LICENSE: This source file is subject to the MIT license that is available
+ * through the world-wide-web at the following URI:
+ * http://opensource.org/licenses/mit-license.php
+ *
+ * @category  Testing 
+ * @package   Testing_DocTest
+ * @author    David JEAN LOUIS <izimobil@gmail.com>
+ * @copyright 2008 David JEAN LOUIS
+ * @license   http://opensource.org/licenses/mit-license.php MIT License 
+ * @version   CVS: $Id$
+ * @link      http://pear.php.net/package/Testing_DocTest
+ * @since     File available since release 0.1.0
+ */
+
+error_reporting(E_ALL | E_STRICT); // be strict
+
+// Testing_DocTest_main {{{
+
+/**
+ * Main function, parse argc/argv and return a return code.
+ *
+ * @return integer
+ */
+function Testing_DocTest_main()
+{
+    // Check the PHP version.
+    if (version_compare(PHP_VERSION, '5.1.0') === -1) {
+        fwrite(STDERR, "ERROR: Testing_DocTest requires PHP 5.1.0 or greater.\n");
+        return 2;
+    }
+    // so it can be run in dev phase
+    if (is_file(dirname(__FILE__).'/../DocTest.php') === true) {
+        include_once dirname(__FILE__).'/../DocTest.php';
+    } else {
+        include_once 'Testing/DocTest.php';
+    }
+    $hasConsoleCommandLine = @include_once 'Console/CommandLine.php';
+    if (!$hasConsoleCommandLine) {
+        fwrite(STDERR, "ERROR: Testing_DocTest command line frontend requires "
+                     . "the Console_CommandLine pear package.\n");
+        return 2;
+    }
+    $parser = new Console_CommandLine(array(
+        'description' => 'DocTest command line frontend.',
+        'version'     => '@package_version@'
+    ));
+    $parser->addOption('quiet', array(
+        'short_name'  => '-q',
+        'long_name'   => '--quiet',
+        'description' => 'Be quiet when executing tests.',
+        'action'      => 'StoreTrue'
+    ));
+    $parser->addOption('logfile', array(
+        'short_name'  => '-f',
+        'long_name'   => '--logfile',
+        'description' => 'Log output to file instead of stdout.',
+        'action'      => 'StoreString'
+    ));
+    $parser->addOption('no_colors', array(
+        'short_name'  => '-n',
+        'long_name'   => '--no-colors',
+        'description' => 'Do not colorize output on console.',
+        'action'      => 'StoreTrue'
+    ));
+    $parser->addArgument('files', array(
+        'multiple'    => true,
+        'description' => 'list of files and/or directories containing doc tests.'
+    ));
+    try {
+        $result = $parser->parse();
+        // run doc tests
+        $options = $result->options;
+        unset($options['help'], $options['version']);
+        // windows does not support cli colors
+        if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
+            $options['no_colors'] = true;
+        }
+        $doctest = new Testing_DocTest($options);
+        $doctest->run($result->args['files']);
+    } catch (Exception $exc) {
+        $parser->displayError($exc->getMessage());
+        return 1;
+    }
+    return 0;
+}
+
+// }}}
+
+exit(Testing_DocTest_main());
+
+?>
