@@ -281,10 +281,22 @@ class Testing_DocTest_Reporter_Default implements Testing_DocTest_ReporterInterf
                 }
             }
         }
-        $this->_output(sprintf("\nTotal time    : %.4f sec.\n", $t));
-        $this->_output("Passed tests  : $passed\n");
-        $this->_output("Skipped tests : $skipped\n");
-        $this->_output("Failed tests  : $failed\n\n");
+        $this->_output(sprintf("\nTotal time    : %.4f sec.\n", $t), 36);
+        if ($passed > 0) {
+            $this->_output("Passed tests  : $passed\n", 32);
+        } else {
+            $this->_output("Passed tests  : $passed\n");
+        }
+        if ($skipped > 0) {
+            $this->_output("Skipped tests : $skipped\n", 33);
+        } else {
+            $this->_output("Skipped tests : $skipped\n");
+        }
+        if ($failed > 0) {
+            $this->_output("Failed tests  : $failed\n\n", 31);
+        } else {
+            $this->_output("Failed tests  : $failed\n\n");
+        }
     }
 
     // }}}
