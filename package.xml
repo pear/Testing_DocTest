@@ -20,20 +20,20 @@ There are several advantages in using Testing_DocTest:
   <email>izi@php.net</email>
   <active>yes</active>
  </lead>
- <date>2008-04-11</date>
- <time>09:15:00</time>
+ <date>2009-02-24</date>
  <version>
-  <release>0.3.1</release>
-  <api>0.3.1</api>
+  <release>0.4.0</release>
+  <api>0.4.0</api>
  </version>
  <stability>
-  <release>alpha</release>
-  <api>alpha</api>
+  <release>beta</release>
+  <api>beta</api>
  </stability>
  <license uri="http://www.opensource.org/licenses/mit-license.html">MIT</license>
- <notes>* added a Testing_DocTest_TestSuite class;
-* renamed outputter to reporter;
-* reporter interface improvements.</notes>
+ <notes>
+* implemented feature request #15911: improved stats display,
+* implemented feature request #15928: added a "-t" option to run only specified tests.
+ </notes>
  <contents>
   <dir baseinstalldir="Testing" name="/">
    <file baseinstalldir="Testing"  name="Testing/DocTest/Registry.php" role="php">

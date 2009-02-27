@@ -51,30 +51,37 @@ function Testing_DocTest_main()
         return 2;
     }
     $parser = new Console_CommandLine(array(
-        'description' => 'DocTest command line frontend.',
+        'description' => 'DocTest command line frontend',
         'version'     => '@package_version@'
     ));
     $parser->addOption('quiet', array(
         'short_name'  => '-q',
         'long_name'   => '--quiet',
-        'description' => 'Be quiet when executing tests.',
+        'description' => 'Be quiet when executing tests',
         'action'      => 'StoreTrue'
     ));
     $parser->addOption('logfile', array(
         'short_name'  => '-f',
         'long_name'   => '--logfile',
-        'description' => 'Log output to file instead of stdout.',
+        'description' => 'Log output to file instead of stdout',
         'action'      => 'StoreString'
     ));
     $parser->addOption('no_colors', array(
         'short_name'  => '-n',
         'long_name'   => '--no-colors',
-        'description' => 'Do not colorize output on console.',
+        'description' => 'Do not colorize output on console',
         'action'      => 'StoreTrue'
+    ));
+    $parser->addOption('tests', array(
+        'short_name'  => '-t',
+        'long_name'   => '--tests',
+        'description' => 'Only run tests that match given names '
+                       . '(eg: $ phpdt -t "test 1" "test 2" File.php)',
+        'action'      => 'StoreArray'
     ));
     $parser->addArgument('files', array(
         'multiple'    => true,
-        'description' => 'list of files and/or directories containing doc tests.'
+        'description' => 'list of files and/or directories containing doc tests'
     ));
     try {
         $result = $parser->parse();

@@ -172,33 +172,37 @@ class Testing_DocTest
      */
     public function run(array $pathes)
     {
-        $registry = Testing_DocTest_Registry::singleton();
-        $suites   = $registry->parser->parse($registry->finder->find($pathes));
-        $registry->reporter->onBegin($suites);
+        $reg    = Testing_DocTest_Registry::singleton();
+        $suites = $reg->parser->parse($reg->finder->find($pathes));
+        $reg->reporter->onBegin($suites);
         foreach ($suites as $suite) {
-            $registry->reporter->onTestSuiteBegin($suite);
+            $reg->reporter->onTestSuiteBegin($suite);
             foreach ($suite as $case) {
-                $registry->reporter->onTestCaseBegin($case);
-                $registry->runner->run($case);
+                $reg->reporter->onTestCaseBegin($case);
+                if (!isset($reg->tests) || in_array($case->name, $reg->tests)) {
+                    $reg->runner->run($case);
+                } else {
+                    $case->state = Testing_DocTest_TestCase::STATE_SKIPPED;
+                }
                 switch ($case->state) {
                 case Testing_DocTest_TestCase::STATE_PASSED:
-                    $registry->reporter->onTestCasePass($case);
+                    $reg->reporter->onTestCasePass($case);
                     break;
                 case Testing_DocTest_TestCase::STATE_SKIPPED:
-                    $registry->reporter->onTestCaseSkip($case);
+                    $reg->reporter->onTestCaseSkip($case);
                     break;
                 case Testing_DocTest_TestCase::STATE_FAILED:
-                    $registry->reporter->onTestCaseFail($case);
+                    $reg->reporter->onTestCaseFail($case);
                     break;
                 case Testing_DocTest_TestCase::STATE_ERROR:
-                    $registry->reporter->onTestCaseError($case);
+                    $reg->reporter->onTestCaseError($case);
                     break;
                 }
-                $registry->reporter->onTestCaseEnd($case);
+                $reg->reporter->onTestCaseEnd($case);
             }
-            $registry->reporter->onTestSuiteEnd($suite);
+            $reg->reporter->onTestSuiteEnd($suite);
         }
-        $registry->reporter->onEnd($suites);
+        $reg->reporter->onEnd($suites);
     }
 
     // }}}
