@@ -494,6 +494,35 @@ function multiply($a, $b)
 }
 
 /**
+ * A simple function that multiply two int or float and return a float number.
+ * It throws an exception if arguments given have a wrong type.
+ * 
+ * This example shows the use of an external doctest file.
+ *
+ * <code>
+ * // test-file: tests/external_file.doctest
+ * </code>
+ *
+ * @param mixed $a an int or a float
+ * @param mixed $b an int or a float
+ *
+ * @return float the result of the multiplication
+ * @throws Exception if arguments given have a wrong type
+ */
+function multiply2($a, $b)
+{
+    // check first arg type
+    if (!is_int($a) && !is_float($a)) {
+        throw new Exception("Wrong type for first argument.");
+    }
+    // check second arg type
+    if (!is_int($b) && !is_float($b)) {
+        throw new Exception("Wrong type for second argument.");
+    }
+    return (float)($a * $b);
+}
+
+/**
  * A simple function that return a simple or multidimensional array.
  *
  * <code>

@@ -39,7 +39,7 @@ require_once 'Testing/DocTest/TestCase.php';
  * @author    David JEAN LOUIS <izimobil@gmail.com>
  * @copyright 2008 David JEAN LOUIS
  * @license   http://opensource.org/licenses/mit-license.php MIT License 
- * @version   Release: @package_version@
+ * @version   Release: 0.3.1
  * @link      http://pear.php.net/package/Testing_DocTest
  * @since     Class available since release 0.1.0
  */
@@ -55,6 +55,11 @@ class Testing_DocTest_Parser_Default implements Testing_DocTest_ParserInterface
     // }}}
     // Keywords constants {{{
 
+    /**
+     * Keyword for the name of the external doctest file
+     */
+    const KW_DOCTEST_FILE = 'test-file';
+    
     /**
      * Keyword for the name of the doctest
      */
@@ -392,11 +397,19 @@ class Testing_DocTest_Parser_Default implements Testing_DocTest_ParserInterface
         $ret = array();
         // extract <code></code> blocks, we use preg_match_all because there 
         // could be more than one code block by docstring
-        $rx = '/<code>[\s\*]*(<[\?\%](php)?)?(.*?)([\?\%]>)?[\s\*]*<\/code>/si';
+        $rx = '/<code>[\s\*]*(<[\?\%](php)?)?\s*' 
+            . '(.*?)\s*([\?\%]>)?[\s\*]*<\/code>/si';
         preg_match_all($rx, $docstring, $tokens);
         if (isset($tokens[3]) && is_array($tokens[3])) {
             foreach ($tokens[3] as $i => $token) {
-                $token = trim($token);
+                if ($this->_hasStandaloneDoctest($token)) {
+                    $testfile_contents = $this->_handleStandaloneDoctest($token);
+                    if ($testfile_contents !== false) {
+                        // replace the current doctest code with the contents
+                        // of the external included file
+                        $token = $testfile_contents;
+                    }
+                }
                 if (!$this->_hasDocTest($token)) {
                     // not a doctest
                     continue;
@@ -405,6 +418,23 @@ class Testing_DocTest_Parser_Default implements Testing_DocTest_ParserInterface
             }
         }
         return $ret;
+    }
+
+    // }}}
+    // _hasStandaloneDoctest() {{{
+
+    /**
+     * Return true if the string data provided contains an external doctest file.
+     *
+     * @param string $data The docstring data
+     *
+     * @return boolean
+     */
+    private function _hasStandaloneDoctest($data)
+    {
+        $p = preg_quote(self::SYNTAX_PREFIX, '/');
+        $k = preg_quote(self::KW_DOCTEST_FILE, '/');
+        return preg_match("/$p\s?$k/m", $data);
     }
 
     // }}}
@@ -423,6 +453,41 @@ class Testing_DocTest_Parser_Default implements Testing_DocTest_ParserInterface
         $p = preg_quote(self::SYNTAX_PREFIX, '/');
         $k = preg_quote(self::KW_DOCTEST_EXPECTS, '/');
         return preg_match("/$p\s?$k/m", $data);
+    }
+
+    // }}}
+    // _handleStandaloneDoctest() {{{
+
+    /**
+     * Return the contents of the external doctest file.
+     *
+     * @param string $docbloc The docstring data
+     *
+     * @return mixed boolean or string
+     */
+    private function _handleStandaloneDoctest($docbloc)
+    {
+        $p     = preg_quote(self::SYNTAX_PREFIX, '/');
+        $k     = preg_quote(self::KW_DOCTEST_FILE, '/');
+        $lines = preg_split('/(\n|\r\n)/', $docbloc);
+
+        foreach ($lines as $i => $l) {
+            $l = preg_replace('/^\s*\*\s?/', '', $l);
+            $p = preg_quote(self::SYNTAX_PREFIX, '/');
+            if (preg_match("/^\s*$p\s?($k):\s*(.*)$/", $l, $matches)) {
+                $f = trim($matches[2]);
+                if (false === ($contents = @file_get_contents(realpath($f)))) {
+                    throw new Testing_DocTest_Exception(
+                        "Unable to read standalone doctest file \"$f\""
+                    );
+                }
+                // remove the php tags
+                $rx = '/(<[\?\%](php)?)?(.*?)([\?\%]>)?/si';
+                return preg_replace($rx, '\3', $contents);
+            }
+        }
+        return false;
+            
     }
 
     // }}}
