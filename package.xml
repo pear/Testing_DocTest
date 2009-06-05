@@ -31,6 +31,9 @@ There are several advantages in using Testing_DocTest:
  </stability>
  <license uri="http://www.opensource.org/licenses/mit-license.html">MIT</license>
  <notes>
+* fixed bug #14577 Unmatched code blocks.blocks (thanks kvz),
+* implemented feature request #15963: ability to include standalone doctest files (thanks to Sofia
+  Cardita for the patch),
 * implemented feature request #15911: improved stats display,
 * implemented feature request #15928: added a "-t" option to run only specified tests.
  </notes>
