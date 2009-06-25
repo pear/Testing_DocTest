@@ -20,10 +20,10 @@ There are several advantages in using Testing_DocTest:
   <email>izi@php.net</email>
   <active>yes</active>
  </lead>
- <date>2009-06-05</date>
+ <date>2009-06-25</date>
  <version>
-  <release>0.4.0</release>
-  <api>0.4.0</api>
+  <release>0.4.1</release>
+  <api>0.4.1</api>
  </version>
  <stability>
   <release>beta</release>
@@ -31,49 +31,46 @@ There are several advantages in using Testing_DocTest:
  </stability>
  <license uri="http://www.opensource.org/licenses/mit-license.html">MIT</license>
  <notes>
-* fixed bug #14577 Unmatched code blocks.blocks (thanks kvz),
-* implemented feature request #15963: ability to include standalone doctest files (thanks to Sofia
-  Cardita for the patch),
-* implemented feature request #15911: improved stats display,
-* implemented feature request #15928: added a "-t" option to run only specified tests.
+* fixed bug #16371: installation to wrong location
+* fixed bug #16372 phpdt confused by "{$var}" notation
  </notes>
  <contents>
-  <dir baseinstalldir="Testing" name="/">
-   <file baseinstalldir="Testing"  name="Testing/DocTest/Registry.php" role="php">
+  <dir baseinstalldir="" name="/">
+   <file baseinstalldir=""  name="Testing/DocTest/Registry.php" role="php">
     <tasks:replace from="@package_version@" to="version" type="package-info" />
    </file>
-   <file baseinstalldir="Testing" name="Testing/DocTest/Exception.php" role="php">
+   <file baseinstalldir="" name="Testing/DocTest/Exception.php" role="php">
     <tasks:replace from="@package_version@" to="version" type="package-info" />
    </file>
-   <file baseinstalldir="Testing" name="Testing/DocTest/FinderInterface.php" role="php">
+   <file baseinstalldir="" name="Testing/DocTest/FinderInterface.php" role="php">
     <tasks:replace from="@package_version@" to="version" type="package-info" />
    </file>
-   <file baseinstalldir="Testing" name="Testing/DocTest/ReporterInterface.php" role="php">
+   <file baseinstalldir="" name="Testing/DocTest/ReporterInterface.php" role="php">
     <tasks:replace from="@package_version@" to="version" type="package-info" />
    </file>
-   <file baseinstalldir="Testing" name="Testing/DocTest/ParserInterface.php" role="php">
+   <file baseinstalldir="" name="Testing/DocTest/ParserInterface.php" role="php">
     <tasks:replace from="@package_version@" to="version" type="package-info" />
    </file>
-   <file baseinstalldir="Testing" name="Testing/DocTest/RunnerInterface.php" role="php">
+   <file baseinstalldir="" name="Testing/DocTest/RunnerInterface.php" role="php">
     <tasks:replace from="@package_version@" to="version" type="package-info" />
    </file>
-   <file baseinstalldir="Testing" name="Testing/DocTest/TestCase.php" role="php">
+   <file baseinstalldir="" name="Testing/DocTest/TestCase.php" role="php">
     <tasks:replace from="@package_version@" to="version" type="package-info" />
    </file>
-   <file baseinstalldir="Testing" name="Testing/DocTest/TestSuite.php" role="php">
+   <file baseinstalldir="" name="Testing/DocTest/TestSuite.php" role="php">
     <tasks:replace from="@package_version@" to="version" type="package-info" />
    </file>
-   <file baseinstalldir="Testing" name="Testing/DocTest/Finder/Default.php" role="php">
+   <file baseinstalldir="" name="Testing/DocTest/Finder/Default.php" role="php">
     <tasks:replace from="@package_version@" to="version" type="package-info" />
     <tasks:replace from="@php_dir@" to="php_dir" type="pear-config" />
    </file>
-   <file baseinstalldir="Testing" name="Testing/DocTest/Reporter/Default.php" role="php">
+   <file baseinstalldir="" name="Testing/DocTest/Reporter/Default.php" role="php">
     <tasks:replace from="@package_version@" to="version" type="package-info" />
    </file>
-   <file baseinstalldir="Testing" name="Testing/DocTest/Parser/Default.php" role="php">
+   <file baseinstalldir="" name="Testing/DocTest/Parser/Default.php" role="php">
     <tasks:replace from="@package_version@" to="version" type="package-info" />
    </file>
-   <file baseinstalldir="Testing" name="Testing/DocTest/Runner/Default.php" role="php">
+   <file baseinstalldir="" name="Testing/DocTest/Runner/Default.php" role="php">
     <tasks:replace from="@package_version@" to="version" type="package-info" />
     <tasks:replace from="@php_bin@" to="php_bin" type="pear-config" />
    </file>
@@ -89,10 +86,10 @@ There are several advantages in using Testing_DocTest:
     <tasks:replace from="@package_version@" to="version" type="package-info" />
     <tasks:windowseol />
    </file>
-   <file baseinstalldir="Testing" name="tests/test1.php" role="test">
+   <file baseinstalldir="" name="tests/test1.php" role="test">
     <tasks:replace from="@package_version@" to="version" type="package-info" />
    </file>
-   <file baseinstalldir="Testing" name="Testing/DocTest.php" role="php">
+   <file baseinstalldir="" name="Testing/DocTest.php" role="php">
     <tasks:replace from="@package_version@" to="version" type="package-info" />
     <tasks:replace from="@php_dir@" to="php_dir" type="pear-config" />
    </file>
@@ -134,6 +131,7 @@ There are several advantages in using Testing_DocTest:
   </filelist>
  </phprelease>
  <changelog>
+
   <release>
    <version>
     <release>0.1.0</release>
@@ -147,6 +145,7 @@ There are several advantages in using Testing_DocTest:
    <license uri="http://www.opensource.org/licenses/mit-license.html">MIT</license>
    <notes>initial release</notes>
   </release>
+
   <release>
    <version>
     <release>0.2.0</release>
@@ -166,6 +165,7 @@ There are several advantages in using Testing_DocTest:
 * removed the &quot;global flags&quot; switch in the default runner: it was a bad idea;
 * some bug fixes and robustness improvments.</notes>
   </release>
+
   <release>
    <version>
     <release>0.2.1</release>
@@ -181,6 +181,7 @@ There are several advantages in using Testing_DocTest:
 * now works nearly perfect under windows;
 * fixed a small bug in the Runner.</notes>
   </release>
+
   <release>
    <date>2008-03-17</date>
    <time>19:25:27</time>
@@ -196,6 +197,7 @@ There are several advantages in using Testing_DocTest:
    <notes>* Added @filesource tags and removed unrecognised @const tags.
 * make doctest syntax prefix customisable</notes>
   </release>
+
   <release>
    <date>2008-03-18</date>
    <time>21:51:27</time>
@@ -211,6 +213,7 @@ There are several advantages in using Testing_DocTest:
    <notes>* ini settings can now be set in the doctest using "// ini-set: directive=value" syntax;
 * don't read from stderr for php errors, php throws it on stdout anyway.</notes>
   </release>
+
   <release>
    <date>2008-03-30</date>
    <time>10:25:00</time>
@@ -229,6 +232,7 @@ Changes:
 * Testing_DocTest_TestCase class now uses __get/__set methods;
 * Parser improvements in preparation for the next big refactoring.</notes>
   </release>
+
   <release>
    <date>2008-04-11</date>
    <time>09:15:00</time>
@@ -245,5 +249,25 @@ Changes:
 * renamed outputter to reporter;
 * reporter interface improvements.</notes>
   </release>
+
+  <release>
+   <version>
+    <release>0.4.0</release>
+    <api>0.4.0</api>
+   </version>
+   <stability>
+    <release>beta</release>
+    <api>beta</api>
+   </stability>
+   <license uri="http://www.opensource.org/licenses/mit-license.html">MIT</license>
+   <notes>
+* fixed bug #14577 Unmatched code blocks.blocks (thanks kvz),
+* implemented feature request #15963: ability to include standalone doctest files (thanks to Sofia
+  Cardita for the patch),
+* implemented feature request #15911: improved stats display,
+* implemented feature request #15928: added a "-t" option to run only specified tests.
+   </notes>
+  </release>
+
  </changelog>
 </package>

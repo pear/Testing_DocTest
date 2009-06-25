@@ -269,18 +269,24 @@ class Testing_DocTest_Parser_Default implements Testing_DocTest_ParserInterface
             // return an empty array
             return $return;
         }
-        $curlyLevel = -1;
-        $curlyOpen  = -1;
-        $className  = null;
-        $inClass    = false;
+        $curlyLevel  = -1;
+        $curlyOpen   = -1;
+        $className   = null;
+        $insideQuote = false;
+        $insideClass = false;
         while (false !== ($item = each($tokens))) {
             // memoize curly level in order to detect if we are inside a class
             if (is_string($item['value'])) {
-                if ($item['value'] == '{') {
-                    $curlyLevel++;
-                } else if ($item['value'] == '}' && --$curlyLevel == $curlyOpen) {
-                    // curly is the close curly of current class
-                    $inClass = false;
+                if (!$insideQuote) {
+                    if ($item['value'] == '{') {
+                        $curlyLevel++;
+                    } else if ($item['value'] == '}' && --$curlyLevel == $curlyOpen) {
+                        // curly is the close curly of current class
+                        $insideClass = false;
+                    }
+                }
+                if ($item['value'] == '"') {
+                    $insideQuote = !$insideQuote;
                 }
                 continue;
             }
@@ -308,12 +314,12 @@ class Testing_DocTest_Parser_Default implements Testing_DocTest_ParserInterface
                     continue;
                 }
                 if ($next[0] === T_CLASS) {
-                    $inClass      = true;
+                    $insideClass  = true;
                     $curlyOpen    = $curlyLevel;
                     $ret['name']  = $nToken[1];
                     $className    = $nToken[1];
                     $ret['level'] = 'class';
-                } else if ($inClass) {
+                } else if ($insideClass) {
                     $ret['name']  = $className . '::' . $nToken[1];
                     $ret['level'] = 'method';
                 } else {

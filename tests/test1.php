@@ -383,6 +383,48 @@ class Foo extends Bar
     }
 
     // }}}
+    // Foo::testBug16372pre() {{{
+
+    /**
+     * <code>
+     * // flags: ELLIPSIS
+     * $foo = new Foo();
+     * echo $foo->testBug16372pre();
+     * // expects:
+     * // 2
+     * </code>
+     *
+     * @access public
+     * @return int
+     */
+    public function testBug16372pre() 
+    {
+        $x = 1;
+        $y = "{$x}";
+        return $x + $y;
+    }
+
+    // }}}
+    // Foo::testBug16372() {{{
+
+    /**
+     * <code>
+     * // flags: ELLIPSIS
+     * $foo = new Foo();
+     * echo $foo->testBug16372();
+     * // expects:
+     * // 2
+     * </code>
+     *
+     * @access public
+     * @return int
+     */
+    public function testBug16372() 
+    {
+        return 2;
+    }
+
+    // }}}
 }
 
 /**
