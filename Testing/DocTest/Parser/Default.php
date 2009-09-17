@@ -95,6 +95,11 @@ class Testing_DocTest_Parser_Default implements Testing_DocTest_ParserInterface
      */
     const KW_DOCTEST_CLEAN = 'clean';
 
+    /**
+     * Keyword for the setup part
+     */
+    const KW_DOCTEST_SETUP = 'setup';
+
     // }}}
     // State constants {{{
 
@@ -138,6 +143,11 @@ class Testing_DocTest_Parser_Default implements Testing_DocTest_ParserInterface
      */
     const STATE_CLEAN = 8;
 
+    /**
+     * State after parsing setup line.
+     */
+    const STATE_SETUP = 9;
+
     // }}}
     // Properties {{{
 
@@ -176,6 +186,7 @@ class Testing_DocTest_Parser_Default implements Testing_DocTest_ParserInterface
              . preg_quote(self::KW_DOCTEST_FLAGS, '/')   . '|'
              . preg_quote(self::KW_DOCTEST_SKIP_IF, '/') . '|'
              . preg_quote(self::KW_DOCTEST_INI_SET, '/') . '|'
+             . preg_quote(self::KW_DOCTEST_SETUP, '/')   . '|'
              . preg_quote(self::KW_DOCTEST_CLEAN, '/')   . '|'
              . preg_quote(self::KW_DOCTEST_EXPECTS, '/') . '|'
              . preg_quote(self::KW_DOCTEST_EXPECTS_FILE, '/');
@@ -223,6 +234,10 @@ class Testing_DocTest_Parser_Default implements Testing_DocTest_ParserInterface
                                 break;
                             case self::KW_DOCTEST_CLEAN:
                                 $this->_handleCleanLine($m[2]);
+                                break;
+                            case self::KW_DOCTEST_SETUP:
+                                $this->_handleSetupLine($m[2]);
+                                break;
                             }
                         } else if (preg_match('/^\s*'.$p.'\s?(.*)$/', $l, $m)) {
                             $this->_handleLineContinuation($m[1]);
@@ -298,9 +313,11 @@ class Testing_DocTest_Parser_Default implements Testing_DocTest_ParserInterface
             // find next token
             $ids  = array(T_CLASS, T_FUNCTION, T_DOC_COMMENT);
             $next = $this->_findNextToken($ids, $tokens);
+            /*
             if (false === $next && !empty($return)) {
                 break;
             }
+            */
             // build Testing_DocTest_TestCase instance
             $ret               = array();
             $ret['docComment'] = $token;
@@ -562,7 +579,8 @@ class Testing_DocTest_Parser_Default implements Testing_DocTest_ParserInterface
      */
     private function _handleExpectsLine($line)
     {
-        $states = array(self::STATE_CODE, self::STATE_EXPECTS);
+        $states = array(self::STATE_CODE, self::STATE_EXPECTS,
+            self::STATE_SETUP);
         if (!in_array($this->_state, $states)) {
             throw new Exception("unexpected expects line: $line");
         }
@@ -591,7 +609,8 @@ class Testing_DocTest_Parser_Default implements Testing_DocTest_ParserInterface
      */
     private function _handleExpectsFileLine($line)
     {
-        $states = array(self::STATE_CODE, self::STATE_EXPECTS_FILE);
+        $states = array(self::STATE_CODE, self::STATE_EXPECTS_FILE,
+            self::STATE_SETUP);
         if (!in_array($this->_state, $states)) {
             throw new Exception("unexpected expects-file line: $line");
         }
@@ -617,7 +636,8 @@ class Testing_DocTest_Parser_Default implements Testing_DocTest_ParserInterface
      */
     private function _handleCodeLine($line)
     {
-        $states = array(self::STATE_EXPECTS, self::STATE_EXPECTS_FILE);
+        $states = array(self::STATE_EXPECTS, self::STATE_EXPECTS_FILE,
+            self::STATE_CLEAN);
         if (in_array($this->_state, $states)) {
             throw new Testing_DocTest_Exception("Unexpected code line: $line");
         }
@@ -699,6 +719,29 @@ class Testing_DocTest_Parser_Default implements Testing_DocTest_ParserInterface
     }
 
     // }}}
+    // _handleSetupLine() {{{
+
+    /**
+     * Parse the setup line provided.
+     *
+     * @param string $line the setup line to parse
+     *
+     * @access private
+     * @return void
+     * @throws Testing_DocTest_Exception
+     */
+    private function _handleSetupLine($line)
+    {
+        $states = array(self::STATE_CODE, self::STATE_EXPECTS,
+            self::STATE_EXPECTS_FILE, self::STATE_CLEAN);
+        if (in_array($this->_state, $states)) {
+            throw new Testing_DocTest_Exception("Unexpected setup line: $line");
+        }
+        $this->_testCase->setupCode .= rtrim($line) . "\n";
+        $this->_state                = self::STATE_SETUP;
+    }
+
+    // }}}
     // _handleLineContinuation() {{{
 
     /**
@@ -729,6 +772,10 @@ class Testing_DocTest_Parser_Default implements Testing_DocTest_ParserInterface
             break;
         case self::STATE_CLEAN:
             $this->_handleCleanLine($line);
+            break;
+        case self::STATE_SETUP:
+            $this->_handleSetupLine($line);
+            break;
         }
     }
 

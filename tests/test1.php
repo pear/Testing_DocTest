@@ -47,6 +47,20 @@ class Bar
 }
 
 /**
+ * This is a file level test.
+ *
+ * <code> 
+ * // doctest: file-level doctest 1
+ * // setup:
+ * // $_ENV['OSTYPE'] = 'linux';
+ * echo OS_TYPE;
+ * // expects:
+ * // linux
+ * </code> 
+ */ 
+define('OS_TYPE', $_ENV['OSTYPE']);
+
+/**
  * Foo class.
  *
  * Below, an example of class level doc test.
@@ -629,3 +643,20 @@ function testString()
 {
     return sprintf('A string that cannot be predicted %s.', microtime());
 }
+
+/**
+ * This is another file level test.
+ *
+ * <code> 
+ * // doctest: file-level doctest 2
+ * // setup:
+ * // $_REQUEST['foo'] = 'bar';
+ * var_dump(defined('FOO'));
+ * // expects:
+ * // bool(true)
+ * </code> 
+ */ 
+if (isset($_REQUEST['foo']) && $_REQUEST['foo'] == 'bar') {
+    define('FOO', 'bar');
+}
+

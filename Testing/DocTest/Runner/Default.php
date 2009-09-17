@@ -109,11 +109,11 @@ class Testing_DocTest_Runner_Default implements Testing_DocTest_RunnerInterface
      */
     public function run(Testing_DocTest_TestCase $testCase) 
     {
-        $codetpl = "<?php\n";
+        $codetpl = "<?php\n%s\n";
         if ($testCase->file !== null) {
             $codetpl .= "require_once '{$testCase->file}';\n";
         }
-        $codetpl .= "%s?>\n";
+        $codetpl .= "%s\n?>\n";
         // skip condition
         if (($skipCode = $testCase->skipIfCode) !== null) {
             $skipCode = trim($skipCode);
@@ -137,7 +137,7 @@ class Testing_DocTest_Runner_Default implements Testing_DocTest_RunnerInterface
         } else {
             $options = null;
         }
-        $ret = $this->_exec(sprintf($codetpl, $testCase->code), $options);
+        $ret = $this->_exec(sprintf($codetpl, $testCase->setupCode, $testCase->code), $options);
         if ($ret['code'] !== 0) {
             $testCase->actualValue = trim($ret['output']);
         } else {

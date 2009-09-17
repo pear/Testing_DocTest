@@ -95,6 +95,7 @@ class Testing_DocTest_TestCase
         'flags'         => 0,
         'skipIfCode'    => null,
         'cleanCode'     => null,
+        'setupCode'     => null,
         'expectedValue' => null,
         'actualValue'   => null,
     );
