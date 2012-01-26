@@ -35,7 +35,7 @@ There are several advantages in using Testing_DocTest:
 * fixed package.xml to allow installation via pyrus.
  </notes>
  <contents>
-  <dir baseinstalldir="" name="/">
+  <dir baseinstalldir="/" name="/">
    <file baseinstalldir=""  name="Testing/DocTest/Registry.php" role="php">
     <tasks:replace from="@package_version@" to="version" type="package-info" />
    </file>
