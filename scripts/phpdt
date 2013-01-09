@@ -107,8 +107,8 @@ function Testing_DocTest_main()
 
         if ($options['template_code'])
         {
-		    if (!file_exists($options['template']))
-			    throw new Exception("template ".$options['template']." not found.\n");
+		    if (!file_exists($options['template_code']))
+			    throw new Exception("template ".$options['template_code']." not found.\n");
 	    }
 
 	    if ($options['php_wrapper'])
