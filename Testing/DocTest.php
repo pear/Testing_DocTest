@@ -156,7 +156,7 @@ class Testing_DocTest
             $reg->runner = $instance;
         } else {
             throw new Testing_DocTest_Exception(
-            	'argument 1 of '
+                'argument 1 of '
                 . 'DocTest::accept must implement the finder, reporter, '
                 . 'parser or runner interface.'
             );

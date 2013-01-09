@@ -141,8 +141,8 @@ class Testing_DocTest_Runner_Default implements Testing_DocTest_RunnerInterface
             $ret      = $this->_exec(sprintf('<?php echo %s; ?>', $skipCode));
             if ($ret['code'] ==! 0 || strlen($ret['output']) > 1) {
                 throw new Testing_DocTest_Exception(
-                	'skip-condition in test "'. $testCase->name . 
-                	'" must be a boolean expression, '. 'got: ' . $skipCode
+                    'skip-condition in test "'. $testCase->name . 
+                    '" must be a boolean expression, '. 'got: ' . $skipCode
                 );
             }
             $skip = $ret['code'] === 0 && trim($ret['output']) === '1';
@@ -161,8 +161,8 @@ class Testing_DocTest_Runner_Default implements Testing_DocTest_RunnerInterface
         }
         
         $ret = $this->_exec(
-        	sprintf($codetpl, $testCase->setupCode, $testCase->code),
-        	$options, $testCase
+            sprintf($codetpl, $testCase->setupCode, $testCase->code),
+            $options, $testCase
         );
         
         if ($ret['code'] !== 0) {
@@ -185,8 +185,8 @@ class Testing_DocTest_Runner_Default implements Testing_DocTest_RunnerInterface
             $ret       = $this->_exec(sprintf('<?php %s; ?>', $cleanCode));
             if ($ret['code'] ==! 0) {
                 throw new Testing_DocTest_Exception(
-                	'cleaning code failed in ' . 'test "' .
-                	$testCase->name . '": ' . $cleanCode
+                    'cleaning code failed in ' . 'test "' .
+                    $testCase->name . '": ' . $cleanCode
                 );
             }
         }
@@ -210,7 +210,7 @@ class Testing_DocTest_Runner_Default implements Testing_DocTest_RunnerInterface
         $ret = '';
         foreach ($iniSettings as $k=>$v) {
             if (!$v) {
-            	continue;
+                continue;
             }
             
             if (substr(PHP_OS, 0, 3) == 'WIN') {
@@ -248,8 +248,8 @@ class Testing_DocTest_Runner_Default implements Testing_DocTest_RunnerInterface
         }
         if ($test->hasFlag(Testing_DocTest::FLAG_ELLIPSIS)) {
             $exp = str_replace(
-            	array("\n", "\r\n", '[...]'),
-            	array('', '', '__ellipsis__'), $exp
+                array("\n", "\r\n", '[...]'),
+                array('', '', '__ellipsis__'), $exp
             );
             $act = str_replace(array("\n", "\r\n", '[...]'), '', $act);
             $rx  = preg_quote($exp, '/');
@@ -281,11 +281,11 @@ class Testing_DocTest_Runner_Default implements Testing_DocTest_RunnerInterface
      * @throws Testing_DocTest_Exception if the process cannot be opened
      */
     private function _exec(
-    	$code, $options=null,
-    	Testing_DocTest_TestCase $testCase=null
+        $code, $options=null,
+        Testing_DocTest_TestCase $testCase=null
     ) {
         if (isset($testcase, $testCase->_shellOptions['php_wrapper']) 
-        	&& $testCase->_shellOptions['php_wrapper']
+            && $testCase->_shellOptions['php_wrapper']
         ) {
             //Needed for general framework setup
             putenv('DOCTEST_SCRIPT='.$testCase->file);
