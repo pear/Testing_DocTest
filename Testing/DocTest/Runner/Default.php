@@ -122,10 +122,10 @@ class Testing_DocTest_Runner_Default implements Testing_DocTest_RunnerInterface
         $tmplfile="";
         if ($testCase->tmplCode) {
             $tmplfile=$testCase->tmplCode;
-        } elseif (isset($testCase->_shellOptions['template']) 
-        && $testCase->_shellOptions['template']
+        } elseif (isset($testCase->_shellOptions['template_code']) 
+        && $testCase->_shellOptions['template_code']
         ) {
-            $tmplfile=$testCase->_shellOptions['template'];
+            $tmplfile=$testCase->_shellOptions['template_code'];
         }
 
         if ($tmplfile) {
@@ -284,7 +284,7 @@ class Testing_DocTest_Runner_Default implements Testing_DocTest_RunnerInterface
         $code, $options=null,
         Testing_DocTest_TestCase $testCase=null
     ) {
-        if (isset($testcase, $testCase->_shellOptions['php_wrapper']) 
+        if (isset($testCase, $testCase->_shellOptions['php_wrapper']) 
             && $testCase->_shellOptions['php_wrapper']
         ) {
             //Needed for general framework setup
