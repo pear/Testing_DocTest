@@ -162,7 +162,7 @@ interface Testing_DocTest_ReporterInterface
      * @param array $suites an array of Testing_DocTest_TestSuite instances
      *
      * @access public
-     * @return void
+     * @return int
      */
     public function onEnd(array $suites);
 

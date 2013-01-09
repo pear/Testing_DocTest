@@ -81,6 +81,12 @@ class Testing_DocTest_Parser_Default implements Testing_DocTest_ParserInterface
     const KW_DOCTEST_INI_SET = 'ini-set';
 
     /**
+     * Keyword for the tmpl code settings
+     */
+    const KW_DOCTEST_TMPL_CODE = 'tmpl-code';
+
+
+    /**
      * Keyword for the doctest expected result
      */
     const KW_DOCTEST_EXPECTS = 'expects';
@@ -148,6 +154,13 @@ class Testing_DocTest_Parser_Default implements Testing_DocTest_ParserInterface
      */
     const STATE_SETUP = 9;
 
+    /**
+     * State after parsing tmpl code.
+     */
+    const STATE_TMPL_CODE = 10;
+
+
+
     // }}}
     // Properties {{{
 
@@ -166,6 +179,23 @@ class Testing_DocTest_Parser_Default implements Testing_DocTest_ParserInterface
      * @access private
      */
     private $_testCase = null;
+
+
+    // }}}
+    // setShellOptions() {{{
+
+    /**
+     * set command line options
+     *
+     * @param array $options an array of command line options
+     *
+     * @access public
+     * @return array
+     */
+    public function setShellOptions(array $options)
+    {
+        $this->_shellOptions = $options;
+    }
 
     // }}}
     // parse() {{{
@@ -187,6 +217,7 @@ class Testing_DocTest_Parser_Default implements Testing_DocTest_ParserInterface
              . preg_quote(self::KW_DOCTEST_SKIP_IF, '/') . '|'
              . preg_quote(self::KW_DOCTEST_INI_SET, '/') . '|'
              . preg_quote(self::KW_DOCTEST_SETUP, '/')   . '|'
+             . preg_quote(self::KW_DOCTEST_TMPL_CODE, '/') . '|'
              . preg_quote(self::KW_DOCTEST_CLEAN, '/')   . '|'
              . preg_quote(self::KW_DOCTEST_EXPECTS, '/') . '|'
              . preg_quote(self::KW_DOCTEST_EXPECTS_FILE, '/');
@@ -203,54 +234,65 @@ class Testing_DocTest_Parser_Default implements Testing_DocTest_ParserInterface
                 }
                 foreach ($docblocs as $docbloc) {
                     $this->_testCase        = new Testing_DocTest_TestCase();
+                    $this->_testCase->_shellOptions = $this->_shellOptions;
                     $this->_testCase->file  = $file;
                     $this->_testCase->level = $testCaseData['level'];
                     $this->_testCase->name  = $testCaseData['name'];
                     // split string into an array of lines
                     $lines = preg_split('/(\n|\r\n)/', $docbloc);
-                    foreach ($lines as $i=>$l) {
-                        // remove spaces and * at the beginning
-                        $l = preg_replace('/^\s*\*\s?/', '', $l);
-                        $p = preg_quote(self::SYNTAX_PREFIX, '/');
-                        if (preg_match("/^\s*$p\s?($kw):\s*(.*)$/", $l, $m)) {
-                            switch ($m[1]) {
-                            case self::KW_DOCTEST_NAME:
-                                $this->_handleDoctestLine($m[2]);
-                                break;
-                            case self::KW_DOCTEST_FLAGS:
-                                $this->_handleFlagsLine($m[2]);
-                                break;
-                            case self::KW_DOCTEST_SKIP_IF:
-                                $this->_handleFlagsLine($m[2]);
-                                break;
-                            case self::KW_DOCTEST_INI_SET:
-                                $this->_handleIniSetLine($m[2]);
-                                break;
-                            case self::KW_DOCTEST_EXPECTS:
-                                $this->_handleExpectsLine($m[2]);
-                                break;
-                            case self::KW_DOCTEST_EXPECTS_FILE:
-                                $this->_handleExpectsFileLine($m[2]);
-                                break;
-                            case self::KW_DOCTEST_CLEAN:
-                                $this->_handleCleanLine($m[2]);
-                                break;
-                            case self::KW_DOCTEST_SETUP:
-                                $this->_handleSetupLine($m[2]);
-                                break;
-                            }
-                        } else if (preg_match('/^\s*'.$p.'\s?(.*)$/', $l, $m)) {
-                            $this->_handleLineContinuation($m[1]);
-                        } else {
-                            if (trim($l) != '') {
-                                $this->_handleCodeLine($l);
+                    try {
+                        foreach ($lines as $i=>$l) {
+                            // remove spaces and * at the beginning
+                            $l = preg_replace('/^\s*\*\s?/', '', $l);
+                            $p = preg_quote(self::SYNTAX_PREFIX, '/');
+                            if (preg_match("/^\s*$p\s?($kw):\s*(.*)$/", $l, $m)) {
+                                //First doctest line number
+                                $this->_testCase->lineNumber = $testCaseData['line'];
+    
+                                switch ($m[1]) {
+                                case self::KW_DOCTEST_NAME:
+                                    $this->_handleDoctestLine($m[2]);
+                                    break;
+                                case self::KW_DOCTEST_FLAGS:
+                                    $this->_handleFlagsLine($m[2]);
+                                    break;
+                                case self::KW_DOCTEST_SKIP_IF:
+                                    $this->_handleFlagsLine($m[2]);
+                                    break;
+                                case self::KW_DOCTEST_INI_SET:
+                                    $this->_handleIniSetLine($m[2]);
+                                    break;
+                                case self::KW_DOCTEST_EXPECTS:
+                                    $this->_handleExpectsLine($m[2]);
+                                    break;
+                                case self::KW_DOCTEST_EXPECTS_FILE:
+                                    $this->_handleExpectsFileLine($m[2]);
+                                    break;
+                                case self::KW_DOCTEST_CLEAN:
+                                    $this->_handleCleanLine($m[2]);
+                                    break;
+                                case self::KW_DOCTEST_SETUP:
+                                    $this->_handleSetupLine($m[2]);
+                                    break;
+                                case self::KW_DOCTEST_TMPL_CODE: 
+                                    $this->_handleTmplCode($m[2]);
+                                    break;
+                                }
+                            } else if (preg_match('/^\s*'.$p.'\s?(.*)$/', $l, $m)) {
+                                $this->_handleLineContinuation($m[1]);
+                            } else {
+                                if (trim($l) != '') {
+                                    $this->_handleCodeLine($l);
+                                }
                             }
                         }
+                    
+                    } catch( Exception $e ) {
+                        $this->_testCase->parsingError = $e->getMessage();
                     }
-                
                     // trim last eol
-                    $this->_testCase->expectedValue =
-                        substr($this->_testCase->expectedValue, 0, -1);
+                    $this->_testCase->expectedValue  
+                        = substr($this->_testCase->expectedValue, 0, -1);
                     // reset state
                     $this->_state = null;
                     // append the test case
@@ -260,6 +302,8 @@ class Testing_DocTest_Parser_Default implements Testing_DocTest_ParserInterface
             if ($suite) {
                 $ret[] = $suite;
             }
+
+
         }
         return $ret;
     }
@@ -295,7 +339,9 @@ class Testing_DocTest_Parser_Default implements Testing_DocTest_ParserInterface
                 if (!$insideQuote) {
                     if ($item['value'] == '{') {
                         $curlyLevel++;
-                    } else if ($item['value'] == '}' && --$curlyLevel == $curlyOpen) {
+                    } else if ($item['value'] == '}' 
+                        && --$curlyLevel == $curlyOpen
+                    ) {
                         // curly is the close curly of current class
                         $insideClass = false;
                     }
@@ -321,6 +367,7 @@ class Testing_DocTest_Parser_Default implements Testing_DocTest_ParserInterface
             // build Testing_DocTest_TestCase instance
             $ret               = array();
             $ret['docComment'] = $token;
+            $ret['line']       = $line;
             $ret['file']       = $file;
             if (false === $next || T_DOC_COMMENT === $next[0]) {
                 $ret['name']  = 'test';
@@ -528,7 +575,7 @@ class Testing_DocTest_Parser_Default implements Testing_DocTest_ParserInterface
     private function _handleDoctestLine($line)
     {
         $states = array(null, self::STATE_FLAGS, self::STATE_DOCTEST,
-            self::STATE_SKIP_IF, self::STATE_INI_SET);
+            self::STATE_SKIP_IF, self::STATE_INI_SET, self::STATE_TMPL_CODE);
         if (!in_array($this->_state, $states)) {
             throw new Testing_DocTest_Exception("Unexpected doctest line: $line");
         }
@@ -551,7 +598,7 @@ class Testing_DocTest_Parser_Default implements Testing_DocTest_ParserInterface
     private function _handleFlagsLine($line)
     {
         $states = array(null, self::STATE_FLAGS, self::STATE_DOCTEST,
-            self::STATE_SKIP_IF, self::STATE_INI_SET);
+            self::STATE_SKIP_IF, self::STATE_INI_SET, self::STATE_TMPL_CODE);
         if (!in_array($this->_state, $states)) {
             throw new Testing_DocTest_Exception("Unexpected flags line: $line");
         }
@@ -589,8 +636,8 @@ class Testing_DocTest_Parser_Default implements Testing_DocTest_ParserInterface
         if (substr(trim($line), -1) !== '\\') {
             $this->_testCase->expectedValue .= "\n";
         } else {
-            $this->_testCase->expectedValue = 
-                trim($this->_testCase->expectedValue, '\\');
+            $this->_testCase->expectedValue 
+                = trim($this->_testCase->expectedValue, '\\');
         }
         $this->_state = self::STATE_EXPECTS;
     }
@@ -660,7 +707,7 @@ class Testing_DocTest_Parser_Default implements Testing_DocTest_ParserInterface
     private function _handleSkipIfLine($line)
     {
         $states = array(null, self::STATE_FLAGS, self::STATE_DOCTEST,
-            self::STATE_SKIP_IF, self::STATE_INI_SET);
+            self::STATE_SKIP_IF, self::STATE_INI_SET, self::STATE_TMPL_CODE);
         if (!in_array($this->_state, $states)) {
             throw new Testing_DocTest_Exception("Unexpected skip-if line: $line");
         }
@@ -683,7 +730,7 @@ class Testing_DocTest_Parser_Default implements Testing_DocTest_ParserInterface
     private function _handleIniSetLine($line)
     {
         $states = array(null, self::STATE_FLAGS, self::STATE_DOCTEST,
-            self::STATE_SKIP_IF, self::STATE_INI_SET);
+            self::STATE_SKIP_IF, self::STATE_INI_SET, self::STATE_TMPL_CODE);
         if (!in_array($this->_state, $states)) {
             throw new Testing_DocTest_Exception("Unexpected ini-set line: $line");
         }
@@ -693,6 +740,36 @@ class Testing_DocTest_Parser_Default implements Testing_DocTest_ParserInterface
         }
         $this->_testCase->iniSettings[$a[0]] = $a[1];
         $this->_state                        = self::STATE_INI_SET;
+    }
+
+    // }}}
+    // _handleTmplCode() {{{
+
+    /**
+     * Parse the tmpl-code line provided.
+     *
+     * @param string $line the ini-set line to parse
+     *
+     * @access private
+     * @return void
+     * @throws Testing_DocTest_Exception
+     */
+    private function _handleTmplCode($line)
+    {
+        $states = array(null, self::STATE_FLAGS, self::STATE_DOCTEST,
+            self::STATE_SKIP_IF, self::STATE_INI_SET, self::STATE_TMPL_CODE);
+        if (!in_array($this->_state, $states)) {
+            throw new Testing_DocTest_Exception("Unexpected tmpl-code line: $line");
+        }
+        $tmplfile = trim($line);
+        if (!file_exists($tmplfile)) {
+            throw new Testing_DocTest_Exception(
+                "Malformed tmpl-code line: 
+                $line (File not exists)"
+            );
+        }
+        $this->_testCase->tmplCode=$tmplfile;
+        $this->_state                        = self::STATE_TMPL_CODE;
     }
 
     // }}}
@@ -775,6 +852,9 @@ class Testing_DocTest_Parser_Default implements Testing_DocTest_ParserInterface
             break;
         case self::STATE_SETUP:
             $this->_handleSetupLine($line);
+            break;
+        case self::STATE_TMPL_CODE;
+            $this->_handleTmplCode($line);
             break;
         }
     }
