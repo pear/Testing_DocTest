@@ -666,9 +666,9 @@ if (isset($_REQUEST['foo']) && $_REQUEST['foo'] == 'bar') {
  *
  * <code>
  * // doctest: tmpl-code doctest
- * // tmpl-code: docs/tmpl_code.doctest.tmpl
+ * // tmpl-code: docs/tmpl_code.doctest.php
  *
- * print $this->Bar();
+ * print $this->bar();
  *
  * // expects:
  * // I'm really private

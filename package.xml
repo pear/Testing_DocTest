@@ -86,7 +86,10 @@ There are several advantages in using Testing_DocTest:
     <tasks:replace from="@package_version@" to="version" type="package-info" />
     <tasks:windowseol />
    </file>
-   <file baseinstalldir="" name="tests/test1.php" role="test">
+   <file baseinstalldir="" name="docs/test1.php" role="test">
+    <tasks:replace from="@package_version@" to="version" type="package-info" />
+   </file>
+   <file baseinstalldir="" name="docs/tmpl_code.doctest.tmpl" role="test">
     <tasks:replace from="@package_version@" to="version" type="package-info" />
    </file>
    <file baseinstalldir="" name="Testing/DocTest.php" role="php">
