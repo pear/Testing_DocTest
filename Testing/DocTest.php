@@ -155,9 +155,11 @@ class Testing_DocTest
         } else if ($instance instanceof Testing_DocTest_RunnerInterface) {
             $reg->runner = $instance;
         } else {
-            throw new Testing_DocTest_Exception('argument 1 of '
+            throw new Testing_DocTest_Exception(
+            	'argument 1 of '
                 . 'DocTest::accept must implement the finder, reporter, '
-                . 'parser or runner interface.');
+                . 'parser or runner interface.'
+            );
         }
     }
 
