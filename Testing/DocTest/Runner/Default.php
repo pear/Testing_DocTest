@@ -109,11 +109,32 @@ class Testing_DocTest_Runner_Default implements Testing_DocTest_RunnerInterface
      */
     public function run(Testing_DocTest_TestCase $testCase) 
     {
+        if($testCase->parsingError) {
+            $testCase->state = Testing_DocTest_TestCase::STATE_ERROR;
+            return;
+        }
         $codetpl = "<?php\n%s\n";
         if ($testCase->file !== null) {
             $codetpl .= "require_once '{$testCase->file}';\n";
         }
         $codetpl .= "%s\n?>\n";
+
+        $tmplfile="";
+        if ($testCase->tmplCode) {
+            $tmplfile=$testCase->tmplCode;
+		}
+        elseif (isset($testCase->_shellOptions['template']) && $testCase->_shellOptions['template'])
+		{
+			$tmplfile=$testCase->_shellOptions['template'];
+		}
+
+		if ($tmplfile) {
+            $codetpl=file_get_contents($tmplfile);
+			if(empty($codetpl)) {
+			    throw new Testing_DocTest_Exception("Invalid template: $tmplfile");
+			}
+		}
+
         // skip condition
         if (($skipCode = $testCase->skipIfCode) !== null) {
             $skipCode = trim($skipCode);
@@ -137,7 +158,7 @@ class Testing_DocTest_Runner_Default implements Testing_DocTest_RunnerInterface
         } else {
             $options = null;
         }
-        $ret = $this->_exec(sprintf($codetpl, $testCase->setupCode, $testCase->code), $options);
+		$ret = $this->_exec(sprintf($codetpl, $testCase->setupCode, $testCase->code), $options, $testCase);
         if ($ret['code'] !== 0) {
             $testCase->actualValue = trim($ret['output']);
         } else {
@@ -180,6 +201,7 @@ class Testing_DocTest_Runner_Default implements Testing_DocTest_RunnerInterface
     {
         $ret = '';
         foreach ($iniSettings as $k=>$v) {
+	        if (!$v) continue;	
             if (substr(PHP_OS, 0, 3) == 'WIN') {
                 // XXX check why windows does not like escapeshellarg
                 $ret .= ' -d' . $k . '=' . $v;
@@ -244,21 +266,31 @@ class Testing_DocTest_Runner_Default implements Testing_DocTest_RunnerInterface
      * @return array
      * @throws Testing_DocTest_Exception if the process cannot be opened
      */
-    private function _exec($code, $options=null) 
+    private function _exec($code, $options=null,Testing_DocTest_TestCase $testCase=null) 
     {
+        if (isset($testcase, $testCase->_shellOptions['php_wrapper']) && $testCase->_shellOptions['php_wrapper'])
+        {
+            //Needed for general framework setup
+            putenv('DOCTEST_SCRIPT='.$testCase->file);
+            $php = $testCase->_shellOptions['php_wrapper'];
+        }
+        else
+        {
+            $php = substr('/usr/bin/php', 0, 1) == '@' ? 'php ' : 'php';
+            if (substr(PHP_OS, 0, 3) == 'WIN') {
+                $php = '"' . $php . '"';
+            }
+        }
+
+        if ($options !== null) {
+            $php .= ' ' . $options;
+        }
+
         $descriptors = array(
             0 => array('pipe', 'r'), // stdin
             1 => array('pipe', 'w'), // stdout
             2 => array('pipe', 'w')  // stderr
         );
-        // path to php bin
-        $php = substr('@php_bin@', 0, 1) == '@' ? 'php' : '@php_bin@';
-        if (substr(PHP_OS, 0, 3) == 'WIN') {
-            $php = '"' . $php . '"';
-        }
-        if ($options !== null) {
-            $php .= ' ' . $options;
-        }
         // try to open proc and raise an exception if it fails
         $process = proc_open($php, $descriptors, $pipes);
         if (!is_resource($process)) {
@@ -280,7 +312,7 @@ class Testing_DocTest_Runner_Default implements Testing_DocTest_RunnerInterface
                 // timed out
                 $output .= "\n ** ERROR: process timed out **\n";
                 return array(proc_terminate($process), $output);
-            } 
+            }
             if (false === ($data = fgets($pipes[1]))) {
                 // nothing on stdout, try stderr
                 //if (false === ($data = fgets($pipes[2]))) {

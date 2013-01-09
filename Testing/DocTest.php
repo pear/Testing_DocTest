@@ -102,6 +102,8 @@ class Testing_DocTest
         $reg->parser   = new Testing_DocTest_Parser_Default();
         $reg->runner   = new Testing_DocTest_Runner_Default();
         $reg->reporter = new Testing_DocTest_Reporter_Default();
+
+        $reg->parser->setShellOptions($options);
     }
 
     // }}}
@@ -202,7 +204,7 @@ class Testing_DocTest
             }
             $reg->reporter->onTestSuiteEnd($suite);
         }
-        $reg->reporter->onEnd($suites);
+        return $reg->reporter->onEnd($suites);
     }
 
     // }}}

@@ -66,6 +66,18 @@ function Testing_DocTest_main()
         'description' => 'Log output to file instead of stdout',
         'action'      => 'StoreString'
     ));
+    $parser->addOption('template_code', array(
+        'short_name'  => '-t',
+        'long_name'   => '--template-code',
+        'description' => 'Set default template code',
+        'action'      => 'StoreString'
+    ));
+    $parser->addOption('php_wrapper', array(
+        'short_name'  => '-p',
+        'long_name'   => '--php-wrapper',
+        'description' => 'Set the shell wrapper for php launch (DOCTEST_SCRIPT env var exported with path of current parserd file)',
+        'action'      => 'StoreString'
+    ));
     $parser->addOption('no_colors', array(
         'short_name'  => '-n',
         'long_name'   => '--no-colors',
@@ -92,8 +104,25 @@ function Testing_DocTest_main()
         if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
             $options['no_colors'] = true;
         }
+
+        if ($options['template_code'])
+        {
+		    if (!file_exists($options['template']))
+			    throw new Exception("template ".$options['template']." not found.\n");
+	    }
+
+	    if ($options['php_wrapper'])
+	    {
+		    if (!file_exists($options['php_wrapper']))
+			    throw new Exception("php_wrapper ".$options['php_wrapper']." not found.\n");
+
+		    if(!is_executable($options['php_wrapper']))
+			    throw new Exception("php_wrapper ".$options['php_wrapper']." not executable.\n");
+	    }
+	
         $doctest = new Testing_DocTest($options);
-        $doctest->run($result->args['files']);
+        return $doctest->run($result->args['files']);
+
     } catch (Exception $exc) {
         $parser->displayError($exc->getMessage());
         return 1;

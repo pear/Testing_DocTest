@@ -59,6 +59,14 @@ class Testing_DocTest_Reporter_Default implements Testing_DocTest_ReporterInterf
      */
     private $_logfile = false;
 
+    /**
+     * suite return code
+     *
+     * @var resource $_returncode
+     * @access private
+     */
+    private $_returncode = 0;
+
     // }}}
     // __construct() {{{
 
@@ -190,7 +198,8 @@ class Testing_DocTest_Reporter_Default implements Testing_DocTest_ReporterInterf
      */
     public function onTestCaseFail(Testing_DocTest_TestCase $case)
     {
-        $this->_output('[FAIL]  ', 31, true);
+	$this->_returncode=1;
+        $this->_output("[FAIL]  (Line number ~{$case->lineNumber})\n", 31, true);
         $this->_output("{$case->name}\n", true);
         $this->_output(str_pad(" Expected ", 72, "=", STR_PAD_BOTH), 42, true);
         $this->_output("\n" . trim($case->expectedValue) . "\n", false, true);
@@ -212,7 +221,9 @@ class Testing_DocTest_Reporter_Default implements Testing_DocTest_ReporterInterf
      */
     public function onTestCaseError(Testing_DocTest_TestCase $case)
     {
-        $this->_output('[ERROR] ', 31, true);
+	$this->_returncode=1;
+        $this->_output("[ERROR] \n", 31, true);
+	$this->_output("[PARSING ERROR]: (Line number ~{$case->lineNumber}) {$case->parsingError}\n",31,true);
         $this->_output("{$case->name} in file \"{$case->suite->name}\"\n", true);
         $bar = str_repeat('-', 31);
         $this->_output(str_pad(" Error ", 72, "=", STR_PAD_BOTH), 41, true);
@@ -297,6 +308,8 @@ class Testing_DocTest_Reporter_Default implements Testing_DocTest_ReporterInterf
         } else {
             $this->_output("Failed tests  : $failed\n\n");
         }
+
+	return $this->_returncode;
     }
 
     // }}}

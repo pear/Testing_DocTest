@@ -556,7 +556,7 @@ function multiply($a, $b)
  * This example shows the use of an external doctest file.
  *
  * <code>
- * // test-file: tests/external_file.doctest
+ * // test-file: docs/external_file.doctest
  * </code>
  *
  * @param mixed $a an int or a float
@@ -659,4 +659,19 @@ function testString()
 if (isset($_REQUEST['foo']) && $_REQUEST['foo'] == 'bar') {
     define('FOO', 'bar');
 }
+
+
+/**
+ * simple test of tmplCode flag
+ *
+ * <code>
+ * // doctest: tmpl-code doctest
+ * // tmpl-code: docs/tmpl_code.doctest.tmpl
+ *
+ * print $this->Bar();
+ *
+ * // expects:
+ * // I'm really private
+ * </code>
+ */
 
