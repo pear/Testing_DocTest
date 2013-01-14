@@ -287,7 +287,7 @@ class Testing_DocTest_Parser_Default implements Testing_DocTest_ParserInterface
                             }
                         }
                     
-                    } catch( Exception $e ) {
+                    } catch( Testing_DocTest_Exception $e ) {
                         $this->_testCase->parsingError = $e->getMessage();
                     }
                     // trim last eol
