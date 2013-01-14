@@ -291,7 +291,7 @@ class Testing_DocTest_Runner_Default implements Testing_DocTest_RunnerInterface
             putenv('DOCTEST_SCRIPT='.$testCase->file);
             $php = $testCase->_shellOptions['php_wrapper'];
         } else {
-            $php = substr('/usr/bin/php', 0, 1) == '@' ? 'php ' : 'php';
+            $php = substr('@php_bin@', 0, 1) == '@' ? 'php ' : 'php';
             if (substr(PHP_OS, 0, 3) == 'WIN') {
                 $php = '"' . $php . '"';
             }
