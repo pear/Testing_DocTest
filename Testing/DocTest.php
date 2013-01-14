@@ -102,6 +102,8 @@ class Testing_DocTest
         $reg->parser   = new Testing_DocTest_Parser_Default();
         $reg->runner   = new Testing_DocTest_Runner_Default();
         $reg->reporter = new Testing_DocTest_Reporter_Default();
+
+        $reg->parser->setShellOptions($options);
     }
 
     // }}}
@@ -153,9 +155,11 @@ class Testing_DocTest
         } else if ($instance instanceof Testing_DocTest_RunnerInterface) {
             $reg->runner = $instance;
         } else {
-            throw new Testing_DocTest_Exception('argument 1 of '
+            throw new Testing_DocTest_Exception(
+                'argument 1 of '
                 . 'DocTest::accept must implement the finder, reporter, '
-                . 'parser or runner interface.');
+                . 'parser or runner interface.'
+            );
         }
     }
 
@@ -202,7 +206,7 @@ class Testing_DocTest
             }
             $reg->reporter->onTestSuiteEnd($suite);
         }
-        $reg->reporter->onEnd($suites);
+        return $reg->reporter->onEnd($suites);
     }
 
     // }}}

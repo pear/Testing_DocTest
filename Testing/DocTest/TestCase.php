@@ -94,9 +94,12 @@ class Testing_DocTest_TestCase
         'code'          => null,
         'flags'         => 0,
         'skipIfCode'    => null,
+        'tmplCode'      => null,
         'cleanCode'     => null,
         'setupCode'     => null,
         'expectedValue' => null,
+        'parsingError' => null,
+        'lineNumber' => null,
         'actualValue'   => null,
     );
 
